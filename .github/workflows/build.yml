@@ -1,31 +1,22 @@
-name: Build HaDeS-IOS Kernel
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+name: Build HaDeS-IOS
+on: [push, workflow_dispatch]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    - name: Install Build Dependencies
+    - name: Cài đặt môi trường
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential gcc-multilib nasm make
+        sudo apt-get install -y nasm grub-pc-bin grub-common xorriso gcc-multilib build-essential mtools
 
-    - name: Compile inside HaDeS-IOS
-      run: |
-        cd HaDeS-IOS
-        make
+    - name: Biên dịch (Build)
+      run: make
 
-    - name: Upload Binary Artifact
+    - name: Xuất file ISO
       uses: actions/upload-artifact@v4
       with:
-        name: haodes-kernel-bin
-        path: HaDeS-IOS/myos.bin
+        name: HaDeS-ISO
+        path: myos.iso
