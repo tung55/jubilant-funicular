@@ -1,31 +1,31 @@
-CC = gcc
-CFLAGS = -m32 -c -ffreestanding -O2 -Wall -Wextra
-AS = nasm
-ASFLAGS = -f elf32
-LD = ld
-LDFLAGS = -m elf_i386
+name: Build HaDeS-IOS Kernel
 
-OBJS = boot.o kernel.o pmm.o string.o gui.o
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-all: myos.bin
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-boot.o: boot.asm
-	$(AS) $(ASFLAGS) boot.asm -o boot.o
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-kernel.o: kernel.c
-	$(CC) $(CFLAGS) kernel.c -o kernel.o
+    - name: Install Build Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential gcc-multilib nasm make
 
-pmm.o: pmm.c
-	$(CC) $(CFLAGS) pmm.c -o pmm.o
+    - name: Compile inside HaDeS-IOS
+      run: |
+        cd HaDeS-IOS
+        make
 
-string.o: string.c
-	$(CC) $(CFLAGS) string.c -o string.o
-
-gui.o: gui.c
-	$(CC) $(CFLAGS) gui.c -o gui.o
-
-myos.bin: $(OBJS)
-	$(LD) $(LDFLAGS) -T linker.ld -o myos.bin $(OBJS)
-
-clean:
-	rm -f *.o myos.bin
+    - name: Upload Binary Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: haodes-kernel-bin
+        path: HaDeS-IOS/myos.bin
