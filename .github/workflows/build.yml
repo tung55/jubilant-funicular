@@ -1,4 +1,4 @@
-name: Build Kernel
+name: Build HaDeS-IOS Kernel
 
 on:
   push:
@@ -19,14 +19,13 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y build-essential gcc-multilib nasm make
 
-    - name: Compile Project
+    - name: Compile inside HaDeS-IOS
       run: |
+        cd HaDeS-IOS
         make
 
-    - name: Upload Compiled Binary Artifact
+    - name: Upload Binary Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: kernel-build
-        path: |
-          *.bin
-          *.iso
+        name: haodes-kernel-bin
+        path: HaDeS-IOS/myos.bin
